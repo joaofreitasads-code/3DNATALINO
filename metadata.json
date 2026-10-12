@@ -1,0 +1,8 @@
+{
+  "name": "STL Natalino – Pack de Modelos 3D",
+  "description": "100 Arquivos STL Natalinos para você imprimir, vender e lucrar com sua impressora 3D neste fim de ano.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
