@@ -25,6 +25,14 @@ const CHECKOUT_LINKS = {
   completeCatholicBundle: "https://checkout.wiven.com.br/checkout/cmud275ad00m801pvjxfzvvlf?offer=9579FNK"
 };
 
+const getCheckoutUrl = (url: string) => {
+  if (typeof window === 'undefined') return url;
+  const search = window.location.search;
+  if (!search) return url;
+  const cleanSearch = search.startsWith('?') ? search.slice(1) : search;
+  return url.includes('?') ? `${url}&${cleanSearch}` : `${url}?${cleanSearch}`;
+};
+
 const trackPixelCheckout = (planName: string, value: number) => {
   if (typeof window !== 'undefined' && (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq) {
     (window as unknown as { fbq: (...args: unknown[]) => void }).fbq('track', 'InitiateCheckout', {
@@ -173,6 +181,13 @@ export default function App() {
 
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Meta Pixel PageView tracking on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq) {
+      (window as unknown as { fbq: (...args: unknown[]) => void }).fbq('track', 'PageView');
+    }
+  }, []);
 
   // Compute tomorrow date in Brazilian Portuguese format (DD/MM/YYYY)
   const [tomorrowFormatted, setTomorrowFormatted] = useState("12/10/2026");
@@ -1342,7 +1357,7 @@ export default function App() {
 
               <div className="pt-10">
                 <a 
-                  href={CHECKOUT_LINKS.basic}
+                  href={getCheckoutUrl(CHECKOUT_LINKS.basic)}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackPixelCheckout('Plano Básico', 10.90)}
@@ -1641,7 +1656,7 @@ export default function App() {
 
             <div className="flex flex-col gap-2.5">
               <a
-                href={CHECKOUT_LINKS.basicDiscountPopup}
+                href={getCheckoutUrl(CHECKOUT_LINKS.basicDiscountPopup)}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => {
@@ -1782,7 +1797,7 @@ export default function App() {
 
               <div className="w-full flex flex-col gap-1.5 mt-1">
                 <a 
-                  href={CHECKOUT_LINKS.completeCatholicBundle}
+                  href={getCheckoutUrl(CHECKOUT_LINKS.completeCatholicBundle)}
                   target="_blank" 
                   rel="noopener noreferrer"
                   onClick={() => {
@@ -1801,7 +1816,7 @@ export default function App() {
                 </a>
 
                 <a 
-                  href={CHECKOUT_LINKS.complete}
+                  href={getCheckoutUrl(CHECKOUT_LINKS.complete)}
                   target="_blank" 
                   rel="noopener noreferrer"
                   onClick={() => {
