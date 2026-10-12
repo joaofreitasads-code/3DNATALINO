@@ -144,6 +144,18 @@ const ACCESS_GALLERY_ROW_1 = [
   `${CDN_BASE}/9orprhy_6f7a064b0e.webp`
 ];
 
+const CATHOLIC_SLIDER_IMAGES = [
+  `${CDN_BASE}/xdzcgfo_4944d10926.webp`,
+  `${CDN_BASE}/1hf0i9p_f80ed931a3.webp`,
+  `${CDN_BASE}/5cra14v_a8c418313d.webp`,
+  `${CDN_BASE}/a2ygins_1b5ad8fd16.webp`,
+  `${CDN_BASE}/qjpfa0j_4e1373b692.webp`,
+  `${CDN_BASE}/v9lzqrk_8d3a22fd9c.webp`,
+  `${CDN_BASE}/q2mksrp_cf39d76d6b.webp`,
+  `${CDN_BASE}/ra2kvkv_0a4ccb74c7.webp`,
+  `${CDN_BASE}/v2knd7l_4ec189eae4.webp`
+];
+
 export default function App() {
   const [activeFaq, setActiveFaq] = useState<string | null>("faq-1");
   const [currentTestimonial, setCurrentTestimonial] = useState(3); // Start on 4th as in screenshot
@@ -154,6 +166,10 @@ export default function App() {
   const [previewVideoMuted, setPreviewVideoMuted] = useState(true);
   const [showExitModal, setShowExitModal] = useState(false);
   const [showFloatingBar, setShowFloatingBar] = useState(false);
+  const [showCatholicModal, setShowCatholicModal] = useState(false);
+  const [catholicTimer, setCatholicTimer] = useState(479); // 07:59
+  const [catholicSlide, setCatholicSlide] = useState(0);
+  const [isHoveredCatholic, setIsHoveredCatholic] = useState(false);
 
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -194,6 +210,30 @@ export default function App() {
     document.addEventListener('mouseleave', handleMouseLeave);
     return () => document.removeEventListener('mouseleave', handleMouseLeave);
   }, []);
+
+  // Catholic bundle countdown timer effect
+  useEffect(() => {
+    if (!showCatholicModal) return;
+    const interval = setInterval(() => {
+      setCatholicTimer((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [showCatholicModal]);
+
+  // Catholic bundle auto-slide
+  useEffect(() => {
+    if (!showCatholicModal || isHoveredCatholic) return;
+    const interval = setInterval(() => {
+      setCatholicSlide((prev) => (prev + 1) % CATHOLIC_SLIDER_IMAGES.length);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, [showCatholicModal, isHoveredCatholic]);
+
+  const formatTimer = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Video playback helper
   const handleToggleHeroVideo = () => {
@@ -1364,15 +1404,13 @@ export default function App() {
                   ))}
                 </div>
 
-                <a 
-                  href={CHECKOUT_LINKS.complete}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackPixelCheckout('Plano Completo', 29.90)}
+                <button 
+                  type="button"
+                  onClick={() => setShowCatholicModal(true)}
                   className="animate-pulse-neon w-full py-4 px-6 rounded-xl bg-gradient-to-r from-[#00E676] via-[#00FF66] to-[#05DF72] hover:from-[#00FF66] hover:to-[#00E676] text-slate-950 font-black text-sm sm:text-base md:text-lg uppercase tracking-wider shadow-[0_0_30px_rgba(0,255,102,0.65),0_10px_25px_rgba(0,0,0,0.4)] border-2 border-white transition-all transform hover:-translate-y-0.5 hover:scale-[1.02] active:scale-98 text-center cursor-pointer block"
                 >
                   QUERO O PLANO COMPLETO
-                </a>
+                </button>
 
                 <p className="text-[11px] text-slate-500 font-medium mt-3 flex items-center gap-1.5">
                   <span>🔒</span>
@@ -1621,6 +1659,161 @@ export default function App() {
               >
                 Não, prefiro perder essa oportunidade
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== CATHOLIC PACK UPSELL MODAL (R$ 36,90) ===================== */}
+      {showCatholicModal && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4 overflow-y-auto animate-fadeIn"
+          onClick={() => setShowCatholicModal(false)}
+        >
+          <div 
+            className="relative w-full max-w-sm sm:max-w-md my-auto p-0.5 sm:p-1 rounded-[22px] bg-gradient-to-br from-amber-300 via-rose-500 to-red-600 shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_30px_rgba(220,38,38,0.4)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-[#4c090f] rounded-[20px] p-3 sm:p-4 md:p-5 flex flex-col items-center text-center relative max-h-[95vh] overflow-y-auto">
+              <button 
+                type="button" 
+                onClick={() => setShowCatholicModal(false)}
+                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors text-sm font-bold cursor-pointer z-30" 
+                aria-label="Fechar janela"
+              >
+                ✕
+              </button>
+
+              <div className="inline-flex items-center gap-1 bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-1 shadow animate-pulse border border-red-400/40">
+                <span>⏳</span>
+                <span>OFERTA ÚNICA: {formatTimer(catholicTimer)}</span>
+              </div>
+
+              <h2 className="font-cinzel text-base sm:text-xl font-black text-white leading-tight mb-0.5">
+                Leve Também o <span className="text-amber-400">Pack +500 STLs Católicos</span>!
+              </h2>
+
+              <p className="text-[11px] sm:text-xs text-amber-200 leading-tight mb-2 font-medium px-1">
+                Pague <strong className="text-amber-300 font-extrabold underline">só a diferença de +R$ 7</strong> sobre o Completo e leve os 2 packs por <strong className="text-white font-black">R$ 36,90</strong>!
+              </p>
+
+              {/* Slider of Catholic STLs */}
+              <div 
+                className="w-full max-w-[280px] sm:max-w-[320px] mx-auto my-1 select-none relative"
+                onMouseEnter={() => setIsHoveredCatholic(true)}
+                onMouseLeave={() => setIsHoveredCatholic(false)}
+              >
+                <div className="relative h-28 sm:h-36 w-full rounded-xl overflow-hidden shadow-lg bg-black/60 border border-amber-400/40">
+                  <div 
+                    className="flex w-full h-full transition-transform duration-300 ease-out will-change-transform"
+                    style={{ transform: `translateX(-${catholicSlide * 100}%)` }}
+                  >
+                    {CATHOLIC_SLIDER_IMAGES.map((imgSrc, p) => (
+                      <div key={p} className="w-full h-full shrink-0 flex items-center justify-center p-1">
+                        <img 
+                          src={imgSrc} 
+                          alt={`Modelo STL Católico ${p + 1}`} 
+                          className="w-full h-full object-contain"
+                          loading="eager"
+                          width={320}
+                          height={144}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="absolute top-1.5 left-1.5 bg-[#4c090f]/90 border border-amber-400/60 text-amber-300 text-[9px] font-extrabold px-2 py-0.5 rounded-full backdrop-blur-xs">
+                    ✨ +500 STLs
+                  </div>
+
+                  <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-white/20">
+                    {catholicSlide + 1}/{CATHOLIC_SLIDER_IMAGES.length}
+                  </span>
+
+                  <button 
+                    type="button" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCatholicSlide((prev) => (prev - 1 + CATHOLIC_SLIDER_IMAGES.length) % CATHOLIC_SLIDER_IMAGES.length);
+                    }}
+                    className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/75 hover:bg-black text-white flex items-center justify-center text-xs font-bold border border-white/20 transition-all cursor-pointer"
+                    aria-label="Anterior"
+                  >
+                    ◀
+                  </button>
+
+                  <button 
+                    type="button" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCatholicSlide((prev) => (prev + 1) % CATHOLIC_SLIDER_IMAGES.length);
+                    }}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/75 hover:bg-black text-white flex items-center justify-center text-xs font-bold border border-white/20 transition-all cursor-pointer"
+                    aria-label="Próximo"
+                  >
+                    ▶
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-center gap-1 mt-1">
+                  {CATHOLIC_SLIDER_IMAGES.map((_, p) => (
+                    <button 
+                      key={p} 
+                      type="button" 
+                      onClick={() => setCatholicSlide(p)}
+                      className={`transition-all rounded-full cursor-pointer ${
+                        p === catholicSlide ? "w-3.5 h-1 bg-[#25D366]" : "w-1 h-1 bg-white/30 hover:bg-white/60"
+                      }`}
+                      aria-label={`Slide ${p + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="w-full bg-white/5 border border-white/10 rounded-lg py-1 px-2 text-center my-1 text-[10px] sm:text-[11px] text-white/95">
+                <span>✓ <strong>Plano Completo Natalino</strong> + ✓ <strong>500 STLs Católicos</strong> • Vitalício</span>
+              </div>
+
+              <div className="flex items-center justify-center gap-2 my-1.5">
+                <span className="text-white/50 line-through text-[11px] font-semibold">De R$ 127</span>
+                <span className="text-[10px] uppercase tracking-wider text-[#F7D070] font-bold">POR APENAS:</span>
+                <span className="font-cinzel text-2xl sm:text-3xl font-black text-[#25D366] leading-none">R$ 36,90</span>
+              </div>
+
+              <div className="w-full flex flex-col gap-1.5 mt-1">
+                <a 
+                  href={CHECKOUT_LINKS.completeCatholicBundle}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    trackPixelCheckout('Combo Completo Natalino + 500 Católicos', 36.90);
+                    setShowCatholicModal(false);
+                  }}
+                  className="animate-pulse-neon w-full py-2.5 sm:py-3 px-3 rounded-xl bg-gradient-to-r from-[#00E676] via-[#00FF66] to-[#05DF72] hover:from-[#00FF66] hover:to-[#00E676] text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wide shadow-lg border border-white transition-all transform hover:scale-[1.02] active:scale-98 cursor-pointer flex flex-col items-center justify-center leading-tight gap-0.5"
+                >
+                  <div className="flex items-center gap-1">
+                    <span>✅</span>
+                    <span>SIM! QUERO OS 2 PACKS POR R$ 36,90</span>
+                  </div>
+                  <span className="text-[9px] sm:text-[10px] text-slate-900 font-bold normal-case">
+                    Pague só a diferença de R$ 7 no checkout
+                  </span>
+                </a>
+
+                <a 
+                  href={CHECKOUT_LINKS.complete}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    trackPixelCheckout('Pack Viral Natalino Completo', 29.90);
+                    setShowCatholicModal(false);
+                  }}
+                  className="w-full py-1.5 sm:py-2 px-3 rounded-xl bg-gradient-to-r from-[#B91C1C] via-[#DC2626] to-[#991B1B] hover:from-[#DC2626] hover:to-[#7F1D1D] text-white/90 hover:text-white font-bold text-[10px] sm:text-[11px] uppercase tracking-wide border border-white/25 transition-all transform hover:scale-[1.01] active:scale-98 cursor-pointer flex items-center justify-center gap-1"
+                >
+                  <span>❌</span>
+                  <span>NÃO, QUERO APENAS O COMPLETO (R$ 29,90)</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
